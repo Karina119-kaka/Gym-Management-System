@@ -97,6 +97,7 @@ npm run dev
 
 ### 会员端 `/member`
 - 首页：最近体重/体脂/BMI、本月训练次数与卡路里、今日/明日课表
+- 首页：**AI 健身顾问**——结合本人 BMI/体重/本月训练数据，回答减脂、增肌、饮食、计划、拉伸、伤痛等问题
 - 课程购买：浏览上架课程（含教练信息）、购买生成课时
 - 课程预约：基于已购课时选择上课时间（同一会员/同一教练时间冲突自动拦截），提交后待教练查看
 - 我的预约：查看全部预约与状态（已预约课程自动处理过期失效）
@@ -117,11 +118,39 @@ npm run dev
 
 外键约束保证数据一致性：课程→教练、购买/预约→课程/教练/会员、打卡→会员。
 
+## AI 健身顾问
+
+会员首页内置「AI 健身助手」，提问后会结合该会员的**体重、BMI、本月训练次数、本月消耗卡路里**给出个性化建议。
+
+采用**双引擎设计**，保证任何环境都能使用：
+
+| 引擎 | 配置 | 特点 |
+| --- | --- | --- |
+| 内置知识库（默认） | `ai.provider: local` | 规则引擎 + 健身知识库，**无需联网、无需 Key**，答辩演示稳定可用 |
+| 大模型 | `ai.provider: llm` + base-url/api-key/model | 接入任意 OpenAI 兼容协议模型（DeepSeek / 通义 / OpenAI 等），回答更灵活 |
+
+大模型调用失败（网络异常、Key 失效）会**自动回退**到本地知识库，功能不受影响。
+
+切换为大模型的配置示例（`src/main/resources/application.yml`）：
+
+```yaml
+ai:
+  provider: llm
+  base-url: https://api.deepseek.com/v1/chat/completions
+  api-key: sk-xxxxxxxxxxxxxxxx
+  model: deepseek-chat
+  timeout-ms: 20000
+```
+
+后端实现：`AiAdviceService` / `AiAdviceServiceImpl`（`com.jincheng.service`），
+接口 `GET /api/member/ai/info`（当前引擎）、`POST /api/member/ai/advice`（提问）；
+前端组件：`frontend/src/components/AiAdvisor.vue`。
+
 ## 常用接口速览
 
 - 登录：`POST /api/login/{member|coach|admin}`、`GET /api/verifyCode`
 - 管理端：`/api/admin/member`、`/api/admin/coach`、`/api/admin/course`、`/api/admin/order`
 - 教练端：`/api/coach/course`、`/api/coach/order`（pending/schedule/attendance/notice）
-- 会员端：`/api/member/course`、`/api/member/order`、`/api/member/clockin`、`/api/member/dashboard`
+- 会员端：`/api/member/course`、`/api/member/order`、`/api/member/clockin`、`/api/member/dashboard`、`/api/member/ai`
 
 未登录访问受保护接口返回 401，前端自动跳转登录页。

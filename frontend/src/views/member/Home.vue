@@ -37,6 +37,8 @@
       </article>
     </section>
 
+    <AiAdvisor />
+
     <section class="schedule-grid">
       <article class="schedule-card">
         <div class="schedule-head">
@@ -89,9 +91,13 @@
 
 <script>
 import { get, pickData } from '../../utils/api'
+import AiAdvisor from '../../components/AiAdvisor.vue'
 
 export default {
   name: 'MemberHome',
+  components: {
+    AiAdvisor
+  },
   data() {
     return {
       user: {},

@@ -11,3 +11,16 @@ spring:
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
+
+# AI 健身顾问配置
+# provider=local：使用内置健身知识库（默认，无需联网、无需 Key）
+# provider=llm  ：接入 OpenAI 兼容协议的大模型，必须同时配置 base-url / api-key / model
+#                 大模型调用失败时会自动回退到本地知识库，功能不受影响
+ai:
+  provider: local
+  # 例（DeepSeek）：https://api.deepseek.com/v1/chat/completions
+  # 例（OpenAI）  ：https://api.openai.com/v1/chat/completions
+  base-url: ""
+  api-key: ""
+  model: ""
+  timeout-ms: 20000
