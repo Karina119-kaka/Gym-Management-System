@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jincheng.mapper.CoachMapper">
+    <select id="selectByCoachNo" parameterType="java.lang.String" resultType="com.jincheng.entity.Coach">
+        select * from coach where coach_no = #{coachNo}
+    </select>
+    
+    <select id="selectAll" resultType="com.jincheng.entity.Coach">
+        select * from coach
+    </select>
+    
+    <select id="selectById" parameterType="java.lang.Integer" resultType="com.jincheng.entity.Coach">
+        select * from coach where coach_id = #{id}
+    </select>
+    
+    <insert id="insert" parameterType="com.jincheng.entity.Coach">
+        insert into coach (coach_no, coach_name, coach_sex, coach_age, coach_tel, good_at, coach_status, coach_pwd, create_time)
+        values (#{coachNo}, #{coachName}, #{coachSex}, #{coachAge}, #{coachTel}, #{goodAt}, #{coachStatus}, #{coachPwd}, #{createTime})
+    </insert>
+    
+    <update id="updateById" parameterType="com.jincheng.entity.Coach">
+        update coach set
+        coach_no = #{coachNo},
+        coach_name = #{coachName},
+        coach_sex = #{coachSex},
+        coach_age = #{coachAge},
+        coach_tel = #{coachTel},
+        good_at = #{goodAt},
+        coach_status = #{coachStatus},
+        coach_pwd = #{coachPwd}
+        where coach_id = #{coachId}
+    </update>
+    
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from coach where coach_id = #{id}
+    </delete>
+</mapper>
