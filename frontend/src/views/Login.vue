@@ -115,7 +115,7 @@ export default {
         localStorage.setItem('role', this.currentRole)
         localStorage.setItem('user', JSON.stringify(pickData(result) || {}))
 
-        const target = { member: '/member', coach: '/coach', admin: '/admin' }[this.currentRole] || '/welcome'
+        const target = { member: '/member', coach: '/coach', admin: '/admin' }[this.currentRole] || '/login'
         await this.$router.push(target)
       } catch (error) {
         this.errorMessage = error.message || '登录失败，请稍后重试'

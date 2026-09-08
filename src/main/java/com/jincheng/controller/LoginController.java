@@ -38,12 +38,15 @@ public class LoginController {
         }
 
         Member member = memberService.getByMemberNo(memberNo);
-        if (member != null && memberPwd.equals(member.getMemberPwd())) {
-            session.setAttribute("member", member);
-            session.setAttribute("role", "member");
-            return Result.success("登录成功", member);
+        if (member == null || !memberPwd.equals(member.getMemberPwd())) {
+            return Result.error("账号或密码错误");
         }
-        return Result.error("账号或密码错误");
+        if ("禁用".equals(member.getCardStatus())) {
+            return Result.error("该会员账号已被禁用，请联系管理员");
+        }
+        session.setAttribute("member", member);
+        session.setAttribute("role", "member");
+        return Result.success("登录成功", member);
     }
 
     @PostMapping("/coach")
@@ -57,12 +60,15 @@ public class LoginController {
         }
 
         Coach coach = coachService.getByCoachNo(coachNo);
-        if (coach != null && coachPwd.equals(coach.getCoachPwd())) {
-            session.setAttribute("coach", coach);
-            session.setAttribute("role", "coach");
-            return Result.success("登录成功", coach);
+        if (coach == null || !coachPwd.equals(coach.getCoachPwd())) {
+            return Result.error("账号或密码错误");
         }
-        return Result.error("账号或密码错误");
+        if ("禁用".equals(coach.getCoachStatus())) {
+            return Result.error("该教练账号已被禁用，请联系管理员");
+        }
+        session.setAttribute("coach", coach);
+        session.setAttribute("role", "coach");
+        return Result.success("登录成功", coach);
     }
 
     @PostMapping("/admin")

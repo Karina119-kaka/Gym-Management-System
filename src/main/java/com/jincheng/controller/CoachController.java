@@ -6,6 +6,7 @@ import com.jincheng.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -32,6 +33,9 @@ public class CoachController {
 
     @PostMapping
     public Result add(@RequestBody Coach coach) {
+        if (coach.getCreateTime() == null) {
+            coach.setCreateTime(new Date());
+        }
         if (coachService.addCoach(coach)) {
             return Result.success("添加成功");
         }

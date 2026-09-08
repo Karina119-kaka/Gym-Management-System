@@ -89,12 +89,17 @@ export default {
   beforeUnmount() { if (this.nowTimer) clearInterval(this.nowTimer) },
   methods: {
     async loadUser() {
-      const res = await get('/api/coach/info')
-      const data = pickData(res)
-      if (data) this.user = data
+      try {
+        const res = await get('/api/coach/info')
+        const data = pickData(res)
+        if (data) this.user = data
+      } catch (error) {
+        console.error('教练信息加载失败', error)
+      }
     },
     async loadSchedule() {
-      const res = await get('/api/coach/order/schedule')
+      try {
+        const res = await get('/api/coach/order/schedule')
       const list = Array.isArray(pickData(res)) ? pickData(res) : []
       const now = new Date()
       const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
@@ -110,9 +115,14 @@ export default {
           status: '未开始'
         }
       }
-      this.todaySchedule = list.map(toItem).filter((x) => this.isSameDay(x.rawTime, now)).sort((a, b) => a.rawTime - b.rawTime)
-      this.tomorrowSchedule = list.map(toItem).filter((x) => this.isSameDay(x.rawTime, tomorrow)).sort((a, b) => a.rawTime - b.rawTime)
-      this.refreshDerivedData()
+        this.todaySchedule = list.map(toItem).filter((x) => this.isSameDay(x.rawTime, now)).sort((a, b) => a.rawTime - b.rawTime)
+        this.tomorrowSchedule = list.map(toItem).filter((x) => this.isSameDay(x.rawTime, tomorrow)).sort((a, b) => a.rawTime - b.rawTime)
+        this.refreshDerivedData()
+      } catch (error) {
+        console.error('课表加载失败', error)
+        this.todaySchedule = []
+        this.tomorrowSchedule = []
+      }
     },
     async loadNotice() {
       try {

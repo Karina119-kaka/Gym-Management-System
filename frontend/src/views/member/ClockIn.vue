@@ -102,33 +102,50 @@ export default {
   },
   methods: {
     async loadData() {
-      const res = await get('/api/member/clockin')
-      const data = pickData(res) || {}
-      this.records = Array.isArray(data.records) ? data.records : []
-      this.todayClocked = !!data.todayClocked
-      this.monthCount = Number(data.monthCount || 0)
-      this.currentPage = 1
+      try {
+        const res = await get('/api/member/clockin')
+        const data = pickData(res) || {}
+        this.records = Array.isArray(data.records) ? data.records : []
+        this.todayClocked = !!data.todayClocked
+        this.monthCount = Number(data.monthCount || 0)
+        this.currentPage = 1
+      } catch (error) {
+        this.$message.error(error.message || '打卡记录加载失败')
+      }
     },
     async loadLatestMetrics() {
-      const res = await get('/api/member/dashboard')
-      const latest = (pickData(res) || {}).latestMetrics || {}
-      this.metricsForm = {
-        ...this.metricsForm,
-        weightKg: latest.weightKg ?? null,
-        bodyFatPct: latest.bodyFatPct ?? null,
-        bmi: latest.bmi ?? null,
-        dataSource: latest.dataSource || 'manual'
+      try {
+        const res = await get('/api/member/dashboard')
+        const latest = (pickData(res) || {}).latestMetrics || {}
+        this.metricsForm = {
+          ...this.metricsForm,
+          weightKg: latest.weightKg ?? null,
+          bodyFatPct: latest.bodyFatPct ?? null,
+          bmi: latest.bmi ?? null,
+          sessionCalories: latest.sessionCalories ?? 0,
+          dataSource: latest.dataSource || 'manual'
+        }
+      } catch (_) {
+        // 看板数据加载失败不影响打卡主流程
       }
     },
     async handleClockIn() {
-      await postForm('/api/member/clockin', {}, { method: 'POST' })
-      this.$message.success('打卡成功')
-      this.loadData()
+      try {
+        await postForm('/api/member/clockin', {}, { method: 'POST' })
+        this.$message.success('打卡成功')
+        this.loadData()
+      } catch (error) {
+        this.$message.error(error.message || '打卡失败')
+      }
     },
     async saveMetrics() {
-      await postJson('/api/member/dashboard/metrics', this.metricsForm, { method: 'POST' })
-      this.$message.success('本次训练数据已保存')
-      this.loadData()
+      try {
+        await postJson('/api/member/dashboard/metrics', this.metricsForm, { method: 'POST' })
+        this.$message.success('本次训练数据已保存')
+        this.loadData()
+      } catch (error) {
+        this.$message.error(error.message || '保存失败')
+      }
     },
     format(value) {
       return value ? new Date(value).toLocaleString('zh-CN') : '-'

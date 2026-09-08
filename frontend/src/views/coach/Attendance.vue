@@ -50,9 +50,13 @@ export default {
   },
   methods: {
     async loadRows() {
-      const result = await get('/api/coach/order/attendance')
-      const list = pickData(result)
-      this.rows = Array.isArray(list) ? list : []
+      try {
+        const result = await get('/api/coach/order/attendance')
+        const list = pickData(result)
+        this.rows = Array.isArray(list) ? list : []
+      } catch (error) {
+        this.$message.error(error.message || '考勤数据加载失败')
+      }
     },
     async setStatus(row, status) {
       try {
@@ -72,9 +76,6 @@ export default {
       return orderTime.getTime() <= new Date().getTime()
     },
     normalizeStatus(v) {
-      if (v === '棰勭害鎴愬姛') return '预约成功'
-      if (v === '宸插埌搴?') return '已到店'
-      if (v === '鏈埌搴?') return '未到店'
       return v || '-'
     }
   }

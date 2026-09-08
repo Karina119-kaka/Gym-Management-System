@@ -6,6 +6,8 @@ public class Admin implements Serializable {
     private Integer adminId;
     private String adminNo;
     private String adminName;
+    private String adminSex;
+    private String adminTel;
     private String adminPwd;
 
     public Integer getAdminId() {
@@ -30,6 +32,22 @@ public class Admin implements Serializable {
 
     public void setAdminName(String adminName) {
         this.adminName = adminName;
+    }
+
+    public String getAdminSex() {
+        return adminSex;
+    }
+
+    public void setAdminSex(String adminSex) {
+        this.adminSex = adminSex;
+    }
+
+    public String getAdminTel() {
+        return adminTel;
+    }
+
+    public void setAdminTel(String adminTel) {
+        this.adminTel = adminTel;
     }
 
     public String getAdminPwd() {

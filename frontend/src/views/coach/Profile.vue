@@ -58,44 +58,60 @@ export default {
   },
   methods: {
     async loadProfile() {
-      const result = await get('/api/coach/info')
-      const profile = pickData(result) || {}
-      this.form = {
-        coachName: profile.coachName || '',
-        coachSex: this.normalizeSex(profile.coachSex),
-        coachAge: profile.coachAge || '',
-        coachTel: profile.coachTel || '',
-        goodAt: profile.goodAt || '',
-        coachStatus: profile.coachStatus || '',
-        createTime: profile.createTime ? this.formatDate(profile.createTime) : ''
+      try {
+        const result = await get('/api/coach/info')
+        const profile = pickData(result) || {}
+        this.form = {
+          coachName: profile.coachName || '',
+          coachSex: this.normalizeSex(profile.coachSex),
+          coachAge: profile.coachAge || '',
+          coachTel: profile.coachTel || '',
+          goodAt: profile.goodAt || '',
+          coachStatus: profile.coachStatus || '',
+          createTime: profile.createTime ? this.formatDate(profile.createTime) : ''
+        }
+        this.syncLocalUser(profile)
+      } catch (error) {
+        this.$message.error(error.message || '个人信息加载失败')
       }
-      this.syncLocalUser(profile)
     },
     cancelEdit() {
       this.isEditing = false
       this.loadProfile()
     },
     async updateProfile() {
-      if (!this.form.coachAge || !this.form.coachTel) return this.$message.warning('请填写完整信息')
+      const age = Number(this.form.coachAge)
+      if (this.form.coachAge === '' || this.form.coachAge === null || Number.isNaN(age) || age <= 0 || age > 150) {
+        return this.$message.warning('请填写正确的年龄')
+      }
+      if (!this.form.coachTel) return this.$message.warning('请填写联系电话')
       const payload = {
         coachName: this.form.coachName,
         coachSex: this.form.coachSex,
-        coachAge: this.form.coachAge,
+        coachAge: age,
         coachTel: this.form.coachTel,
         goodAt: this.form.goodAt
       }
-      const result = await postJson('/api/coach/update', payload, { method: 'PUT' })
-      this.$message.success('个人信息更新成功')
-      this.syncLocalUser(pickData(result) || payload)
-      this.isEditing = false
-      this.loadProfile()
+      try {
+        const result = await postJson('/api/coach/update', payload, { method: 'PUT' })
+        this.$message.success('个人信息更新成功')
+        this.syncLocalUser(pickData(result) || payload)
+        this.isEditing = false
+        this.loadProfile()
+      } catch (error) {
+        this.$message.error(error.message || '个人信息更新失败')
+      }
     },
     async updatePassword() {
       if (!this.passwordForm.oldPassword || !this.passwordForm.newPassword) return this.$message.warning('请填写旧密码和新密码')
       if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) return this.$message.error('两次输入的新密码不一致')
-      await postJson('/api/coach/password', this.passwordForm, { method: 'PUT' })
-      this.$message.success('密码修改成功')
-      this.passwordForm = { oldPassword: '', newPassword: '', confirmPassword: '' }
+      try {
+        await postJson('/api/coach/password', this.passwordForm, { method: 'PUT' })
+        this.$message.success('密码修改成功')
+        this.passwordForm = { oldPassword: '', newPassword: '', confirmPassword: '' }
+      } catch (error) {
+        this.$message.error(error.message || '密码修改失败')
+      }
     },
     syncLocalUser(updatedUser) {
       const currentUser = JSON.parse(localStorage.getItem('user')) || {}

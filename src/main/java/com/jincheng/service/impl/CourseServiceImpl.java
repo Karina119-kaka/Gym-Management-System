@@ -46,6 +46,12 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public boolean auditCourse(Long id, String status) {
+        // 统一课程状态语义：待审核 -> (审核通过)上架 / (审核拒绝)下架
+        if ("已通过".equals(status)) {
+            status = "上架";
+        } else if ("已拒绝".equals(status)) {
+            status = "下架";
+        }
         Course course = getCourseById(id);
         if (course != null) {
             course.setSaleStatus(status);

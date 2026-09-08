@@ -6,9 +6,11 @@
         <select v-model="statusFilter" @change="loadOrders">
           <option value="">全部状态</option>
           <option value="待教练查看">待教练查看</option>
+          <option value="已预约">已预约</option>
           <option value="预约成功">预约成功</option>
           <option value="已到店">已到店</option>
-          <option value="预约失败">预约失败</option>
+          <option value="未到店">未到店</option>
+          <option value="预约失败">预约失败（含已拒绝/已失效）</option>
         </select>
       </div>
 

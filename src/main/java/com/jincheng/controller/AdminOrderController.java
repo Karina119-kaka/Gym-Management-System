@@ -109,13 +109,6 @@ public class AdminOrderController {
 
     private String normalizeStatus(String status) {
         if (status == null) return "";
-        if ("妫板嫮瀹抽幋鎰".equals(status)) return OrderStatus.RESERVED_SUCCESS;
-        if ("瀵板懏鏆€缂佸啯鐓￠惇?".equals(status)) return OrderStatus.PENDING_REVIEW;
-        if ("瀹告煡顣╃痪?".equals(status)) return OrderStatus.RESERVED;
-        if ("瀹稿弶瀚嗙紒?".equals(status)) return OrderStatus.REJECTED;
-        if ("瀹告彃銇戦弫?".equals(status)) return OrderStatus.FAILED;
-        if ("瀹告彃鍩屾惔?".equals(status)) return OrderStatus.ARRIVED;
-        if ("閺堫亜鍩屾惔?".equals(status)) return OrderStatus.NOT_ARRIVED;
         if ("预约失败".equals(status)) return OrderStatus.FAILED;
         return status;
     }

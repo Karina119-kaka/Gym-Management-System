@@ -11,6 +11,14 @@
         <div class="form-grid">
           <div class="form-group"><label>管理员账号</label><input type="text" v-model="form.adminNo" disabled></div>
           <div class="form-group"><label>管理员姓名</label><input type="text" v-model="form.adminName" :disabled="!isEditing"></div>
+          <div class="form-group">
+            <label>性别</label>
+            <select v-model="form.adminSex" :disabled="!isEditing">
+              <option value="男">男</option>
+              <option value="女">女</option>
+            </select>
+          </div>
+          <div class="form-group"><label>联系电话</label><input type="text" v-model="form.adminTel" :disabled="!isEditing" maxlength="11"></div>
         </div>
         <div class="button-group">
           <button v-if="!isEditing" type="button" class="edit-btn" @click="isEditing = true">编辑资料</button>
@@ -44,7 +52,7 @@ export default {
   data() {
     return {
       isEditing: false,
-      form: { adminNo: '', adminName: '' },
+      form: { adminNo: '', adminName: '', adminSex: '', adminTel: '' },
       passwordForm: { oldPassword: '', newPassword: '', confirmPassword: '' }
     }
   },
@@ -57,7 +65,12 @@ export default {
         const result = await get('/api/admin/profile/info')
         const profile = pickData(result)
         if (profile) {
-          this.form = { adminNo: profile.adminNo || '', adminName: profile.adminName || '' }
+          this.form = {
+            adminNo: profile.adminNo || '',
+            adminName: profile.adminName || '',
+            adminSex: profile.adminSex || '男',
+            adminTel: profile.adminTel || ''
+          }
           localStorage.setItem('user', JSON.stringify(profile))
           window.dispatchEvent(new Event('user-updated'))
         }
@@ -71,8 +84,13 @@ export default {
     },
     async updateProfile() {
       if (!this.form.adminName) return this.$message.warning('请填写管理员姓名')
+      if (this.form.adminTel && !/^1\d{10}$/.test(this.form.adminTel)) return this.$message.warning('请填写正确的 11 位手机号')
       try {
-        await postJson('/api/admin/profile/update', { adminName: this.form.adminName }, { method: 'PUT' })
+        await postJson('/api/admin/profile/update', {
+          adminName: this.form.adminName,
+          adminSex: this.form.adminSex,
+          adminTel: this.form.adminTel
+        }, { method: 'PUT' })
         this.$message.success('个人信息更新成功')
         this.isEditing = false
         this.loadProfile()
@@ -108,6 +126,8 @@ export default {
 .form-group { display: flex; flex-direction: column; gap: 7px; }
 .form-group label { color: #374151; font-size: 14px; font-weight: 800; }
 .form-group input { height: 42px; padding: 0 12px; border: 1px solid #d1d5db; border-radius: 6px; color: #111827; font-size: 15px; }
+.form-group select { height: 42px; padding: 0 10px; border: 1px solid #d1d5db; border-radius: 6px; color: #111827; font-size: 15px; background: #fff; }
+.form-group select:disabled { background: #f3f4f6; color: #4b5563; cursor: not-allowed; }
 .form-group input:disabled { background: #f3f4f6; color: #4b5563; cursor: not-allowed; }
 .button-group { display: flex; gap: 10px; }
 .edit-btn, .save-btn, .cancel-btn, .submit-btn { min-width: 108px; height: 42px; padding: 0 18px; border: none; border-radius: 6px; cursor: pointer; color: #fff; font-size: 15px; font-weight: 800; }

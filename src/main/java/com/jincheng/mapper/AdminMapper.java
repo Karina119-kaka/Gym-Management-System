@@ -15,6 +15,6 @@ public interface AdminMapper {
     @Select("SELECT * FROM admin WHERE admin_id = #{adminId}")
     Admin selectById(@Param("adminId") Integer adminId);
 
-    @Update("UPDATE admin SET admin_name=#{adminName}, admin_pwd=#{adminPwd} WHERE admin_id=#{adminId}")
+    @Update("UPDATE admin SET admin_name=#{adminName}, admin_sex=#{adminSex}, admin_tel=#{adminTel}, admin_pwd=#{adminPwd} WHERE admin_id=#{adminId}")
     int updateById(Admin admin);
 }

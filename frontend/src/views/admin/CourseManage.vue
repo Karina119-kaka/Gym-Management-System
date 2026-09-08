@@ -10,19 +10,22 @@
         <el-table :data="pagedCourses" border stripe>
           <el-table-column prop="courseId" label="ID" width="80" />
           <el-table-column prop="courseName" label="课程名称" width="150" />
-          <el-table-column prop="coachId" label="教练ID" width="100" />
+          <el-table-column label="教练" width="100">
+            <template #default="{ row }">{{ coachName(row.coachId) }}</template>
+          </el-table-column>
           <el-table-column prop="coursePrice" label="价格" width="100" />
           <el-table-column prop="courseIntro" label="课程简介" min-width="180" show-overflow-tooltip />
           <el-table-column prop="courseDetail" label="详细描述" min-width="240" show-overflow-tooltip />
-          <el-table-column prop="saleStatus" label="状态" width="120" />
+          <el-table-column prop="saleStatus" label="状态" width="100" />
           <el-table-column prop="createTime" label="创建时间" width="180">
             <template #default="{ row }">{{ formatDate(row.createTime) }}</template>
           </el-table-column>
-          <el-table-column label="操作" width="220">
+          <el-table-column label="操作" width="300">
             <template #default="{ row }">
               <el-button size="small" type="primary" @click="openEditDialog(row)">编辑</el-button>
               <el-button size="small" type="success" @click="setStatus(row, '上架')">上架</el-button>
               <el-button size="small" type="warning" @click="setStatus(row, '下架')">下架</el-button>
+              <el-button size="small" type="danger" @click="deleteCourse(row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -44,7 +47,9 @@
         <el-table :data="pagedPendingCourses" border stripe>
           <el-table-column prop="courseId" label="ID" width="80" />
           <el-table-column prop="courseName" label="课程名称" width="150" />
-          <el-table-column prop="coachId" label="教练ID" width="100" />
+          <el-table-column label="教练" width="100">
+            <template #default="{ row }">{{ coachName(row.coachId) }}</template>
+          </el-table-column>
           <el-table-column prop="coursePrice" label="价格" width="100" />
           <el-table-column prop="courseIntro" label="课程简介" min-width="180" show-overflow-tooltip />
           <el-table-column prop="courseDetail" label="详细描述" min-width="240" show-overflow-tooltip />
@@ -187,6 +192,24 @@ export default {
       } catch (error) {
         this.$message.error(error.message || '状态更新失败')
       }
+    },
+    deleteCourse(row) {
+      this.$confirm(`确定删除课程“${row.courseName}”吗？删除后不可恢复。`, '提示', { type: 'warning' })
+        .then(async () => {
+          try {
+            await postJson(`/api/admin/course/${row.courseId}`, {}, { method: 'DELETE' })
+            this.$message.success('删除成功')
+            this.loadAll()
+          } catch (error) {
+            this.$message.error(error.message || '删除失败')
+          }
+        })
+        .catch(() => {})
+    },
+    coachName(coachId) {
+      if (!coachId) return '-'
+      const coach = this.coaches.find((item) => String(item.coachId) === String(coachId))
+      return coach ? coach.coachName : `ID:${coachId}`
     },
     formatDate(date) {
       return date ? new Date(date).toLocaleString('zh-CN') : ''

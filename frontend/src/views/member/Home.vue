@@ -157,10 +157,6 @@ export default {
     },
     formatTime(v) { return v ? new Date(v).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false }) : '-' },
     normalizeStatus(v) {
-      if (v === '棰勭害鎴愬姛') return '预约成功'
-      if (v === '宸插埌搴?') return '已到店'
-      if (v === '鏈埌搴?') return '未到店'
-      if (v === '寰呮暀缁冩煡鐪?') return '待教练查看'
       return v || '-'
     }
   }

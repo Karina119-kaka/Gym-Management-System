@@ -111,7 +111,7 @@ public class MemberCourseOrderController {
     }
 
     private boolean isCourseReservable(String saleStatus) {
-        return OrderStatus.ON_SALE.equals(saleStatus) || "ON_SALE".equals(saleStatus) || "涓婃灦".equals(saleStatus);
+        return OrderStatus.ON_SALE.equals(saleStatus) || "ON_SALE".equals(saleStatus);
     }
 
     private Integer toInt(Object value) {

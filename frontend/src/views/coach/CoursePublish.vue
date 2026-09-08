@@ -23,7 +23,7 @@
         </div>
         <div class="form-item">
           <label>状态</label>
-          <input type="text" value="待审核（提交后由管理员审核）" disabled />
+          <input type="text" :value="isEdit ? '保存后将重新提交管理员审核' : '提交后由管理员审核'" disabled />
         </div>
         <div class="actions">
           <button type="submit" class="btn primary">{{ isEdit ? '保存修改' : '发布课程' }}</button>
@@ -59,7 +59,8 @@
             <td>{{ formatDate(item.createTime) }}</td>
             <td>
               <button class="mini" @click="startEdit(item)">编辑</button>
-              <button class="mini danger" @click="deleteCourse(item.courseId)">删除</button>
+              <button v-if="canOffShelf(item)" class="mini warn" @click="offShelf(item)">下架</button>
+              <button class="mini danger" @click="deleteCourse(item)">删除</button>
             </td>
           </tr>
           <tr v-if="!courses.length">
@@ -95,17 +96,25 @@ export default {
   },
   methods: {
     async loadCourses() {
-      const res = await get('/api/coach/course/list')
-      const list = pickData(res)
-      this.courses = Array.isArray(list) ? list : []
+      try {
+        const res = await get('/api/coach/course/list')
+        const list = pickData(res)
+        this.courses = Array.isArray(list) ? list : []
+      } catch (error) {
+        this.$message.error(error.message || '课程列表加载失败')
+      }
     },
     async submitCourse() {
       if (!this.form.courseName) return this.$message.warning('请填写课程名称')
       if (this.form.coursePrice === '' || Number(this.form.coursePrice) < 0) return this.$message.warning('请填写正确价格')
-      await postJson('/api/coach/course', this.form, { method: this.isEdit ? 'PUT' : 'POST' })
-      this.$message.success(this.isEdit ? '课程更新成功' : '课程发布成功')
-      this.resetForm()
-      this.loadCourses()
+      try {
+        await postJson('/api/coach/course', this.form, { method: this.isEdit ? 'PUT' : 'POST' })
+        this.$message.success(this.isEdit ? '课程更新成功，等待管理员审核' : '课程发布成功')
+        this.resetForm()
+        this.loadCourses()
+      } catch (error) {
+        this.$message.error(error.message || '保存失败')
+      }
     },
     startEdit(item) {
       this.isEdit = true
@@ -130,10 +139,34 @@ export default {
         saleStatus: '待审核'
       }
     },
-    async deleteCourse(id) {
-      await postJson(`/api/coach/course/${id}`, {}, { method: 'DELETE' })
-      this.$message.success('删除成功')
-      this.loadCourses()
+    async deleteCourse(item) {
+      this.$confirm(`确定删除课程“${item.courseName}”吗？删除后不可恢复。`, '提示', { type: 'warning' })
+        .then(async () => {
+          try {
+            await postJson(`/api/coach/course/${item.courseId}`, {}, { method: 'DELETE' })
+            this.$message.success('删除成功')
+            this.loadCourses()
+          } catch (error) {
+            this.$message.error(error.message || '删除失败')
+          }
+        })
+        .catch(() => {})
+    },
+    canOffShelf(item) {
+      return this.normalizeStatus(item.saleStatus) === '上架'
+    },
+    offShelf(item) {
+      this.$confirm(`确定下架课程“${item.courseName}”吗？`, '提示', { type: 'warning' })
+        .then(async () => {
+          try {
+            await postJson(`/api/coach/course/status/${item.courseId}?status=${encodeURIComponent('下架')}`, {}, { method: 'PUT' })
+            this.$message.success('课程已下架')
+            this.loadCourses()
+          } catch (error) {
+            this.$message.error(error.message || '下架失败')
+          }
+        })
+        .catch(() => {})
     },
     normalizeStatus(status) {
       if (status === 'ON_SALE') return '上架'
@@ -171,6 +204,7 @@ export default {
 .status.on { background: #dcfce7; color: #166534; }
 .status.off { background: #e2e8f0; color: #334155; }
 .mini { margin-right: 6px; height: 30px; padding: 0 10px; border-radius: 6px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer; }
+.mini.warn { color: #b45309; border-color: #fde68a; background: #fffbeb; }
 .mini.danger { color: #b91c1c; border-color: #fecaca; background: #fff1f2; }
 .empty { text-align: center; color: #94a3b8; }
 </style>

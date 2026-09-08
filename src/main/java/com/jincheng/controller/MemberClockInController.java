@@ -59,7 +59,6 @@ public class MemberClockInController {
             ClockIn clockIn = new ClockIn();
             clockIn.setMemberId(memberId);
             clockIn.setClockTime(new Date());
-            clockIn.setClockStatus("COMPLETED");
             if (clockInMapper.insertStart(clockIn) > 0) {
                 return Result.success("打卡成功");
             }

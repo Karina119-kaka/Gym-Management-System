@@ -37,6 +37,12 @@ public class AdminProfileController {
             return Result.error("管理员不存在");
         }
         dbAdmin.setAdminName(updatedAdmin.getAdminName());
+        if (updatedAdmin.getAdminSex() != null) {
+            dbAdmin.setAdminSex(updatedAdmin.getAdminSex());
+        }
+        if (updatedAdmin.getAdminTel() != null) {
+            dbAdmin.setAdminTel(updatedAdmin.getAdminTel());
+        }
         adminService.updateAdmin(dbAdmin);
         session.setAttribute("admin", dbAdmin);
         return Result.success("更新成功", dbAdmin);

@@ -23,12 +23,12 @@ public interface CourseBuyMapper {
             "FROM course_buy b LEFT JOIN course c ON c.course_id = b.course_id " +
             "LEFT JOIN coach ON coach.coach_id = b.coach_id " +
             "WHERE b.member_id = #{memberId} " +
-            "AND (b.pay_status = '已购买' OR b.pay_status = 'PAID' OR b.pay_status = '宸茶喘涔?') " +
+            "AND b.pay_status IN ('已购买', 'PAID') " +
             "ORDER BY b.buy_time DESC, b.buy_id DESC")
     List<Map<String, Object>> selectPurchasedByMemberId(@Param("memberId") Integer memberId);
 
     @Select("SELECT * FROM course_buy WHERE buy_id = #{buyId} AND member_id = #{memberId} " +
-            "AND (pay_status = '已购买' OR pay_status = 'PAID' OR pay_status = '宸茶喘涔?') LIMIT 1")
+            "AND pay_status IN ('已购买', 'PAID') LIMIT 1")
     CourseBuy selectPurchasedByBuyId(@Param("buyId") Integer buyId, @Param("memberId") Integer memberId);
 
     @Select("SELECT b.course_id AS courseId, MIN(b.coach_id) AS coachId, MAX(c.course_name) AS courseName, " +
@@ -40,18 +40,18 @@ public interface CourseBuyMapper {
             "LEFT JOIN course c ON c.course_id = b.course_id " +
             "LEFT JOIN coach ON coach.coach_id = b.coach_id " +
             "LEFT JOIN (SELECT DISTINCT buy_id FROM course_order " +
-            "           WHERE order_status IN ('待教练查看', '预约成功', '已预约', '预约中', '寰呮暀缁冩煡鐪?', '棰勭害鎴愬姛', '宸查绾?', '棰勭害涓?')) used " +
+            "           WHERE order_status IN ('待教练查看', '预约成功', '已预约', '预约中')) used " +
             "ON used.buy_id = b.buy_id " +
             "WHERE b.member_id = #{memberId} " +
-            "AND (b.pay_status = '已购买' OR b.pay_status = 'PAID' OR b.pay_status = '宸茶喘涔?') " +
+            "AND b.pay_status IN ('已购买', 'PAID') " +
             "GROUP BY b.course_id ORDER BY MAX(b.buy_time) DESC")
     List<Map<String, Object>> selectReservableSummaryByMemberId(@Param("memberId") Integer memberId);
 
     @Select("SELECT b.buy_id FROM course_buy b " +
             "LEFT JOIN course_order o ON o.buy_id = b.buy_id " +
-            "AND o.order_status IN ('待教练查看', '预约成功', '已预约', '预约中', '寰呮暀缁冩煡鐪?', '棰勭害鎴愬姛', '宸查绾?', '棰勭害涓?') " +
+            "AND o.order_status IN ('待教练查看', '预约成功', '已预约', '预约中') " +
             "WHERE b.member_id = #{memberId} AND b.course_id = #{courseId} " +
-            "AND (b.pay_status = '已购买' OR b.pay_status = 'PAID' OR b.pay_status = '宸茶喘涔?') " +
+            "AND b.pay_status IN ('已购买', 'PAID') " +
             "AND o.order_id IS NULL " +
             "ORDER BY b.buy_time ASC, b.buy_id ASC LIMIT 1")
     Integer selectNextReservableBuyId(@Param("memberId") Integer memberId, @Param("courseId") Integer courseId);

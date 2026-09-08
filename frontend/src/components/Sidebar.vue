@@ -33,7 +33,7 @@ export default {
   methods: {
     goToHome() {
       const roleHomeMap = { member: '/member', coach: '/coach', admin: '/admin' }
-      this.$router.push(roleHomeMap[this.role] || '/welcome')
+      this.$router.push(roleHomeMap[this.role] || '/login')
     },
     goToProfile() { this.$router.push(`/${this.role}/profile`) },
     goToCoursePurchase() { this.$router.push('/member/course') },

@@ -84,14 +84,18 @@ export default {
   },
   methods: {
     async loadProfile() {
-      const result = await get('/api/member/info')
-      const profile = pickData(result) || {}
-      this.form = {
-        memberNo: profile.memberNo || '',
-        memberName: profile.memberName || '',
-        memberSex: profile.memberSex || '男',
-        memberAge: profile.memberAge || '',
-        memberTel: profile.memberTel || ''
+      try {
+        const result = await get('/api/member/info')
+        const profile = pickData(result) || {}
+        this.form = {
+          memberNo: profile.memberNo || '',
+          memberName: profile.memberName || '',
+          memberSex: profile.memberSex || '男',
+          memberAge: profile.memberAge || '',
+          memberTel: profile.memberTel || ''
+        }
+      } catch (error) {
+        this.$message.error(error.message || '个人信息加载失败')
       }
     },
     cancelEdit() {
@@ -99,15 +103,21 @@ export default {
       this.loadProfile()
     },
     async updateProfile() {
-      await postJson('/api/member/update', {
-        memberName: this.form.memberName,
-        memberSex: this.form.memberSex,
-        memberAge: this.form.memberAge,
-        memberTel: this.form.memberTel
-      }, { method: 'PUT' })
-      this.$message.success('更新成功')
-      this.isEditing = false
-      this.loadProfile()
+      if (!this.form.memberName) return this.$message.warning('请填写姓名')
+      if (this.form.memberTel && !/^1\d{10}$/.test(this.form.memberTel)) return this.$message.warning('请填写正确的 11 位手机号')
+      try {
+        await postJson('/api/member/update', {
+          memberName: this.form.memberName,
+          memberSex: this.form.memberSex,
+          memberAge: this.form.memberAge ? Number(this.form.memberAge) : null,
+          memberTel: this.form.memberTel
+        }, { method: 'PUT' })
+        this.$message.success('更新成功')
+        this.isEditing = false
+        this.loadProfile()
+      } catch (error) {
+        this.$message.error(error.message || '更新失败')
+      }
     },
     async updatePassword() {
       if (!this.passwordForm.oldPassword || !this.passwordForm.newPassword) {
@@ -118,9 +128,13 @@ export default {
         this.$message.error('两次输入的新密码不一致')
         return
       }
-      await postJson('/api/member/password', this.passwordForm, { method: 'PUT' })
-      this.$message.success('密码修改成功')
-      this.passwordForm = { oldPassword: '', newPassword: '', confirmPassword: '' }
+      try {
+        await postJson('/api/member/password', this.passwordForm, { method: 'PUT' })
+        this.$message.success('密码修改成功')
+        this.passwordForm = { oldPassword: '', newPassword: '', confirmPassword: '' }
+      } catch (error) {
+        this.$message.error(error.message || '密码修改失败')
+      }
     }
   }
 }

@@ -105,7 +105,15 @@ public class CoachCourseController {
         if (dbCourse == null) {
             return Result.error("课程不存在或无权限");
         }
-        return Result.error("教练不能直接上架/下架，请提交管理员审核");
+        // 教练仅可主动下架自己的课程；重新上架需提交管理员审核
+        if (!"下架".equals(status)) {
+            return Result.error("教练只能将课程下架，重新上架请提交管理员审核");
+        }
+        dbCourse.setSaleStatus("下架");
+        if (courseMapper.updateById(dbCourse) > 0) {
+            return Result.success("课程已下架");
+        }
+        return Result.error("下架失败");
     }
 
     @DeleteMapping("/{id}")

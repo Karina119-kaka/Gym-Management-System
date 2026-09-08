@@ -3,13 +3,19 @@ package com.jincheng.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * 健身打卡记录，对应 clock_in 表。
+ * 打卡成功后可通过 update 补充体重/体脂/BMI/卡路里等训练数据。
+ */
 public class ClockIn implements Serializable {
     private Integer clockId;
     private Integer memberId;
     private Date clockTime;
-    private Date endTime;
-    private Integer durationMin;
-    private String clockStatus;
+    private Double weightKg;
+    private Double bodyFatPct;
+    private Double bmi;
+    private Integer calories;
+    private String dataSource;
 
     public Integer getClockId() {
         return clockId;
@@ -35,27 +41,43 @@ public class ClockIn implements Serializable {
         this.clockTime = clockTime;
     }
 
-    public Date getEndTime() {
-        return endTime;
+    public Double getWeightKg() {
+        return weightKg;
     }
 
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
+    public void setWeightKg(Double weightKg) {
+        this.weightKg = weightKg;
     }
 
-    public Integer getDurationMin() {
-        return durationMin;
+    public Double getBodyFatPct() {
+        return bodyFatPct;
     }
 
-    public void setDurationMin(Integer durationMin) {
-        this.durationMin = durationMin;
+    public void setBodyFatPct(Double bodyFatPct) {
+        this.bodyFatPct = bodyFatPct;
     }
 
-    public String getClockStatus() {
-        return clockStatus;
+    public Double getBmi() {
+        return bmi;
     }
 
-    public void setClockStatus(String clockStatus) {
-        this.clockStatus = clockStatus;
+    public void setBmi(Double bmi) {
+        this.bmi = bmi;
+    }
+
+    public Integer getCalories() {
+        return calories;
+    }
+
+    public void setCalories(Integer calories) {
+        this.calories = calories;
+    }
+
+    public String getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(String dataSource) {
+        this.dataSource = dataSource;
     }
 }

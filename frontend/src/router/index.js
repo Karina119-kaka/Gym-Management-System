@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../views/Login.vue'
-import Welcome from '../views/Welcome.vue'
 import MemberHome from '../views/member/Home.vue'
 import MemberProfile from '../views/member/Profile.vue'
 import CoursePurchase from '../views/member/CoursePurchase.vue'
@@ -29,14 +28,6 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login
-  },
-  {
-    path: '/welcome',
-    name: 'Welcome',
-    component: Welcome,
-    meta: {
-      requiresAuth: true
-    }
   },
   {
     path: '/:pathMatch(.*)*',
