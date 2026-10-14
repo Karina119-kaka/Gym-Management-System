@@ -17,10 +17,22 @@ mybatis:
 # provider=llm  ：接入 OpenAI 兼容协议的大模型，必须同时配置 base-url / api-key / model
 #                 大模型调用失败时会自动回退到本地知识库，功能不受影响
 ai:
-  provider: local
+  provider: ${AI_PROVIDER:local}
   # 例（DeepSeek）：https://api.deepseek.com/v1/chat/completions
   # 例（OpenAI）  ：https://api.openai.com/v1/chat/completions
-  base-url: ""
-  api-key: ""
-  model: ""
-  timeout-ms: 20000
+  base-url: ${AI_BASE_URL:https://api.deepseek.com/v1/chat/completions}
+  # Key 通过环境变量 AI_API_KEY 注入，切勿直接写进本文件（会被 git 跟踪泄露）
+  # IDEA 启动：Run/Debug Configurations → Environment variables → AI_API_KEY=sk-xxx
+  # 命令行启动：set AI_API_KEY=sk-xxx && mvn spring-boot:run
+  api-key: ${AI_API_KEY:}
+  model: ${AI_MODEL:deepseek-chat}
+  # 免费模型（如智谱 GLM-4-Flash）输出限速，超时设宽松些避免误降级
+  timeout-ms: ${AI_TIMEOUT_MS:45000}
+  # 单次回答最大输出 token（约 300~350 中文字），越小越快；可用环境变量 AI_MAX_TOKENS 调整
+  max-tokens: ${AI_MAX_TOKENS:512}
+  # 每会员每日咨询次数上限（防刷账单）
+  rate-limit.daily: 20
+  # 成本估算（元/千 token），默认按 DeepSeek 定价；用免费模型时可用环境变量覆盖为 0
+  # 智谱 GLM-4-Flash 免费：AI_PRICE_INPUT_PER_1K=0 / AI_PRICE_OUTPUT_PER_1K=0
+  price-input-per-1k: ${AI_PRICE_INPUT_PER_1K:0.001}
+  price-output-per-1k: ${AI_PRICE_OUTPUT_PER_1K:0.002}

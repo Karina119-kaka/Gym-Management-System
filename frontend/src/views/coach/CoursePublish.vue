@@ -169,7 +169,7 @@ export default {
         .catch(() => {})
     },
     normalizeStatus(status) {
-      if (status === 'ON_SALE') return '上架'
+      // 后端状态值已统一为中文（待审核/上架/下架），无需再兼容 ON_SALE 等历史英文值
       if (!status) return '下架'
       return status
     },

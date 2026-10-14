@@ -32,9 +32,12 @@ public interface CourseMapper {
                 co.coach_age AS coachAge
             FROM course c
             LEFT JOIN coach co ON c.coach_id = co.coach_id
-            WHERE c.sale_status = 'ON_SALE' OR c.sale_status = '上架'
+            WHERE c.sale_status = '上架'
             ORDER BY c.create_time DESC, c.course_id DESC
             """)
+    /**
+     * 仅返回已上架课程，状态值取自 {@code CourseStatus.ON_SALE}。
+     */
     List<Map<String, Object>> selectOnSaleWithCoach();
 
     @Select("""

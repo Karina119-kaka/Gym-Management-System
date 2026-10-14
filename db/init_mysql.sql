@@ -254,6 +254,30 @@ WHERE b.Member_id = (SELECT Member_id FROM member WHERE Member_no = 'member001')
   AND b.Course_id = (SELECT Course_id FROM course WHERE Course_name = '减脂塑形私教')
   AND b.Buy_time = DATE_SUB(NOW(), INTERVAL 1 DAY);
 
+-- ---------------------------------------------------------------------
+-- AI 调用日志表（成本监控、限流审计、问题排查）
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS ai_call_log (
+    log_id             BIGINT AUTO_INCREMENT COMMENT '日志ID' PRIMARY KEY,
+    member_id          INT             NOT NULL COMMENT '会员ID',
+    question           VARCHAR(500)    NOT NULL COMMENT '原始问题（最多200字）',
+    question_summary   VARCHAR(120)    NULL     COMMENT '问题摘要（前100字+…）',
+    answer             MEDIUMTEXT      NULL     COMMENT 'AI回答（异常时存错误摘要，正常为空以控制表大小）',
+    source             VARCHAR(20)    NULL     COMMENT 'llm / local / fallback',
+    model              VARCHAR(50)     NULL     COMMENT '调用的模型名',
+    prompt_tokens      INT             NULL     COMMENT '输入token数',
+    completion_tokens  INT             NULL     COMMENT '输出token数',
+    total_tokens       INT             NULL     COMMENT '总token数',
+    cost_yuan          DECIMAL(10, 4)  NULL     COMMENT '估算成本（元）',
+    elapsed_ms         INT             NOT NULL COMMENT '本次调用耗时(毫秒)',
+    success            TINYINT(1)      NOT NULL COMMENT '1=成功 0=异常',
+    error_message      VARCHAR(500)    NULL     COMMENT '失败时的错误信息',
+    history_turns      INT             NULL     COMMENT '本次请求带的历史轮数',
+    create_time        DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '调用时间',
+    INDEX idx_member_day (member_id, create_time),
+    INDEX idx_create_time (create_time)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = 'AI 调用日志表';
+
 -- 会员2 明天上午的已确认课程（明日课表演示）
 INSERT INTO course_order (Member_id, Coach_id, Course_id, Buy_id, Order_time, Order_status)
 SELECT b.Member_id, b.Coach_id, b.Course_id, b.Buy_id,

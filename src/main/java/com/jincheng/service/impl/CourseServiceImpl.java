@@ -3,6 +3,7 @@ package com.jincheng.service.impl;
 import com.jincheng.entity.Course;
 import com.jincheng.mapper.CourseMapper;
 import com.jincheng.service.CourseService;
+import com.jincheng.util.CourseStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<Course> getPendingCourses() {
-        return courseMapper.selectByStatus("待审核");
+        return courseMapper.selectByStatus(CourseStatus.REVIEWING);
     }
 
     @Override
@@ -48,9 +49,9 @@ public class CourseServiceImpl implements CourseService {
     public boolean auditCourse(Long id, String status) {
         // 统一课程状态语义：待审核 -> (审核通过)上架 / (审核拒绝)下架
         if ("已通过".equals(status)) {
-            status = "上架";
+            status = CourseStatus.ON_SALE;
         } else if ("已拒绝".equals(status)) {
-            status = "下架";
+            status = CourseStatus.OFF_SALE;
         }
         Course course = getCourseById(id);
         if (course != null) {

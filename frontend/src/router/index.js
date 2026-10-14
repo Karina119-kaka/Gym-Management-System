@@ -18,6 +18,7 @@ import MemberManage from '../views/admin/MemberManage.vue'
 import CoachManage from '../views/admin/CoachManage.vue'
 import CourseManage from '../views/admin/CourseManage.vue'
 import AdminOrderManage from '../views/admin/OrderManage.vue'
+import AdminAiStats from '../views/admin/AiStats.vue'
 
 const routes = [
   {
@@ -196,7 +197,16 @@ const routes = [
       role: 'admin'
     }
   },
-  
+  {
+    path: '/admin/ai-stats',
+    name: 'AdminAiStats',
+    component: AdminAiStats,
+    meta: {
+      requiresAuth: true,
+      role: 'admin'
+    }
+  },
+
 ]
 
 const router = createRouter({

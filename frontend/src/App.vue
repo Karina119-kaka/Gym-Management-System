@@ -25,26 +25,37 @@ export default {
     Navbar,
     Sidebar
   },
+  data() {
+    return {
+      // localStorage 不是响应式的，必须用 data 属性并在路由变化时手动同步，
+      // 否则登录后 isLoggedIn 仍是初始的 false，会错误地把已登录用户重定向回 /login。
+      isLoggedIn: localStorage.getItem('role') !== null
+    }
+  },
   computed: {
-    isLoggedIn() {
-      return localStorage.getItem('role') !== null
-    },
     isLoginPage() {
       return this.$route.path === '/login'
     }
   },
-  mounted() {
-    // 检查是否需要认证
-    if (this.$route.meta.requiresAuth && !this.isLoggedIn) {
-      this.$router.push('/login')
-    }
-  },
-  watch: {
-    '$route'() {
-      // 当路由变化时，检查是否需要认证
+  methods: {
+    syncAuth() {
+      this.isLoggedIn = localStorage.getItem('role') !== null
+    },
+    checkAuth() {
+      this.syncAuth()
       if (this.$route.meta.requiresAuth && !this.isLoggedIn) {
         this.$router.push('/login')
       }
+    }
+  },
+  mounted() {
+    // 检查是否需要认证
+    this.checkAuth()
+  },
+  watch: {
+    '$route'() {
+      // 当路由变化时，重新同步认证状态并检查是否需要认证
+      this.checkAuth()
     }
   }
 }

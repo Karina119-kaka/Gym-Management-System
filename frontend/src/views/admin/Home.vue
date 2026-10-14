@@ -105,6 +105,10 @@
         <strong>订单管理</strong>
         <span>查看预约与考勤结果</span>
       </button>
+      <button type="button" class="quick-card" @click="goTo('/admin/ai-stats')">
+        <strong>AI 调用统计</strong>
+        <span>调用量、成本与成功率监控</span>
+      </button>
     </section>
   </div>
 </template>
@@ -233,7 +237,7 @@ export default {
 .legend-item label { color: #475569; font-weight: 700; }
 .legend-item strong { color: #111827; }
 
-.quick-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.quick-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
 .quick-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; background: #fff; cursor: pointer; text-align: left; display: grid; gap: 8px; transition: transform 0.18s ease, box-shadow 0.18s ease; }
 .quick-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08); }
 .quick-card strong { color: #0f172a; font-size: 18px; }

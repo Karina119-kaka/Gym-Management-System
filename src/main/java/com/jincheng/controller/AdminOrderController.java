@@ -109,7 +109,10 @@ public class AdminOrderController {
 
     private String normalizeStatus(String status) {
         if (status == null) return "";
-        if ("预约失败".equals(status)) return OrderStatus.FAILED;
+        // 已失效 / 已拒绝 统一按「预约失败」统计（查询层已聚合，此处兜底）
+        if (OrderStatus.EXPIRED.equals(status) || OrderStatus.REJECTED.equals(status)) {
+            return OrderStatus.FAILED;
+        }
         return status;
     }
 }

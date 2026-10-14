@@ -6,6 +6,8 @@ import com.jincheng.entity.Member;
 import com.jincheng.mapper.CourseBuyMapper;
 import com.jincheng.mapper.CourseMapper;
 import com.jincheng.service.CourseService;
+import com.jincheng.util.CourseStatus;
+import com.jincheng.util.PayStatus;
 import com.jincheng.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +40,7 @@ public class MemberCourseController {
             return Result.error("课程不存在");
         }
         Object saleStatus = detail.get("saleStatus");
-        if (saleStatus == null || !isOnSale(String.valueOf(saleStatus))) {
+        if (saleStatus == null || !CourseStatus.isOnSale(String.valueOf(saleStatus))) {
             return Result.error("课程未上架");
         }
         return Result.success(detail);
@@ -55,7 +57,7 @@ public class MemberCourseController {
         if (course == null) {
             return Result.error("课程不存在");
         }
-        if (!isOnSale(course.getSaleStatus())) {
+        if (!CourseStatus.isOnSale(course.getSaleStatus())) {
             return Result.error("课程未上架，暂不能购买");
         }
 
@@ -64,16 +66,12 @@ public class MemberCourseController {
         courseBuy.setCoachId(course.getCoachId());
         courseBuy.setCourseId(course.getCourseId());
         courseBuy.setPayPrice(course.getCoursePrice());
-        courseBuy.setPayStatus("已购买");
+        courseBuy.setPayStatus(PayStatus.PAID);
         courseBuy.setBuyTime(new Date());
 
         if (courseBuyMapper.insert(courseBuy) > 0) {
             return Result.success("购买成功", courseBuy);
         }
         return Result.error("购买失败");
-    }
-
-    private boolean isOnSale(String status) {
-        return "ON_SALE".equalsIgnoreCase(status) || "上架".equals(status);
     }
 }

@@ -7,6 +7,7 @@ import com.jincheng.entity.Member;
 import com.jincheng.mapper.CourseBuyMapper;
 import com.jincheng.mapper.CourseMapper;
 import com.jincheng.mapper.CourseOrderMapper;
+import com.jincheng.util.CourseStatus;
 import com.jincheng.util.OrderStatus;
 import com.jincheng.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,7 +112,7 @@ public class MemberCourseOrderController {
     }
 
     private boolean isCourseReservable(String saleStatus) {
-        return OrderStatus.ON_SALE.equals(saleStatus) || "ON_SALE".equals(saleStatus);
+        return CourseStatus.isOnSale(saleStatus);
     }
 
     private Integer toInt(Object value) {

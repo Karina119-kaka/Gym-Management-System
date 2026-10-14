@@ -4,6 +4,7 @@ import com.jincheng.entity.Coach;
 import com.jincheng.entity.Course;
 import com.jincheng.mapper.CoachMapper;
 import com.jincheng.mapper.CourseMapper;
+import com.jincheng.util.CourseStatus;
 import com.jincheng.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -56,7 +57,7 @@ public class CoachCourseController {
         Integer coachId = dbCoach != null ? dbCoach.getCoachId() : coach.getCoachId();
 
         course.setCoachId(coachId);
-        course.setSaleStatus("待审核");
+        course.setSaleStatus(CourseStatus.REVIEWING);
         course.setCreateTime(new Date());
         if (courseMapper.insert(course) > 0) {
             return Result.success("发布成功");
@@ -83,7 +84,7 @@ public class CoachCourseController {
         }
         course.setCoachId(coachId);
         course.setCreateTime(dbCourse.getCreateTime());
-        course.setSaleStatus("待审核");
+        course.setSaleStatus(CourseStatus.REVIEWING);
         if (courseMapper.updateById(course) > 0) {
             return Result.success("更新成功");
         }
@@ -106,10 +107,10 @@ public class CoachCourseController {
             return Result.error("课程不存在或无权限");
         }
         // 教练仅可主动下架自己的课程；重新上架需提交管理员审核
-        if (!"下架".equals(status)) {
+        if (!CourseStatus.OFF_SALE.equals(status)) {
             return Result.error("教练只能将课程下架，重新上架请提交管理员审核");
         }
-        dbCourse.setSaleStatus("下架");
+        dbCourse.setSaleStatus(CourseStatus.OFF_SALE);
         if (courseMapper.updateById(dbCourse) > 0) {
             return Result.success("课程已下架");
         }
